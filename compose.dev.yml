@@ -1,0 +1,11 @@
+services:
+  schedule:
+    image: schedule3-service
+    build:
+      context: schedule
+      target: dev
+    volumes:
+      - ./schedule:/go/src/app
+
+    ports:
+      - 3000:3000
