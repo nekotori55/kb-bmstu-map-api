@@ -5,6 +5,9 @@ import (
 	"unicode/utf8"
 )
 
+var romanNumbers = []string{"I", "II", "III", "IV", "V", "VI", "VII", "VIII"}
+var weekdays = []string{"Пн", "Вт", "Ср", "Чт", "Пт", "Сб"}
+
 func slen(str string) int {
 	return utf8.RuneCountInString(str)
 }

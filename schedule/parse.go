@@ -18,9 +18,7 @@ var scheduleParseExp = regexp2.MustCompile(``+
 	regexp2.RE2)
 
 func parseDaySchedule(schedule []string) []lesson {
-	var romanNumbers = []string{"I", "II", "III", "IV", "V", "VI", "VII", "VIII"}
 	var lessonRegularityTokens = []string{"Ч", "З", "П"}
-	var weekdays = []string{"Пн", "Вт", "Ср", "Чт", "Пт", "Сб"}
 
 	var lessons []lesson
 
@@ -31,12 +29,12 @@ func parseDaySchedule(schedule []string) []lesson {
 
 	schedule = schedule[1:] // removing weekday string
 
-	var classNum int
+	var timeSlot int
 	var lessonRegularity int
 	for _, entry := range schedule {
 		// string is a classNum
 		if success, entryIndex := stringStartsWithAnyOf(romanNumbers, entry); success {
-			classNum = entryIndex + 1
+			timeSlot = entryIndex + 1
 			continue
 		}
 
@@ -66,7 +64,7 @@ func parseDaySchedule(schedule []string) []lesson {
 		}
 
 		var newLesson lesson = matchToLesson(match)
-		newLesson.ClassNum = classNum
+		newLesson.TimeSlot = timeSlot
 		newLesson.Regularity = lessonRegularity
 		newLesson.Day = dayNum
 
@@ -81,16 +79,16 @@ func parseDaySchedule(schedule []string) []lesson {
 			continue
 		}
 
-		var newLesson2 lesson = matchToLesson(match2)
-		newLesson2.ClassNum = classNum
-		newLesson2.Regularity = lessonRegularity
-		newLesson2.Day = dayNum
+		var additionalLesson lesson = matchToLesson(match2)
+		additionalLesson.TimeSlot = timeSlot
+		additionalLesson.Regularity = lessonRegularity
+		additionalLesson.Day = dayNum
 
-		if newLesson2.Title == "" {
-			newLesson2.Title = newLesson.Title
+		if additionalLesson.Title == "" {
+			additionalLesson.Title = newLesson.Title
 		}
 
-		lessons = append(lessons, newLesson2)
+		lessons = append(lessons, additionalLesson)
 	}
 
 	return lessons

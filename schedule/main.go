@@ -19,7 +19,7 @@ type lesson struct {
 
 	Day        int `json:"day"`
 	Regularity int `json:"regularity"`
-	ClassNum   int `json:"classNum"`
+	TimeSlot   int `json:"timeSlot"`
 }
 
 func main() {
