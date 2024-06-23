@@ -87,6 +87,9 @@ func parseDaySchedule(schedule []string) []lesson {
 		if additionalLesson.Title == "" {
 			additionalLesson.Title = newLesson.Title
 		}
+		if additionalLesson.LessonType == "" {
+			additionalLesson.LessonType = newLesson.LessonType
+		}
 
 		lessons = append(lessons, additionalLesson)
 	}
