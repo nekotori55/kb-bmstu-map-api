@@ -10,8 +10,9 @@ import (
 
 type lesson struct {
 	Title      string `json:"title"`
-	LessonType string `json:"lessonType"`
+	Type       string `json:"type"`
 	Group      string `json:"group"`
+	Subgroup   int    `json:"subgroup"`
 	Building   string `json:"building"`
 	Room       string `json:"room"`
 	Professors string `json:"professors"`
@@ -19,8 +20,10 @@ type lesson struct {
 
 	Day        int `json:"day"`
 	Regularity int `json:"regularity"`
-	TimeSlot   int `json:"timeSlot"`
+	Index      int `json:"index"`
 }
+
+var apiPath = "https://schedule.iuk4.ru/api/"
 
 func main() {
 	app := fiber.New()
@@ -47,8 +50,8 @@ func getSchedule(year int, group string) map[string][]string {
 
 	agent := fiber.AcquireAgent()
 	agent.Request().Header.SetMethod("GET")
-	agent.Request().SetRequestURI("" +
-		"https://schedule.iuk4.ru/api/getschedule/" +
+	agent.Request().SetRequestURI(apiPath +
+		"getschedule/" +
 		fmt.Sprint(year-1) + "/" +
 		group + "/" +
 		"")

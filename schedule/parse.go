@@ -64,7 +64,7 @@ func parseDaySchedule(schedule []string) []lesson {
 		}
 
 		var newLesson lesson = matchToLesson(match)
-		newLesson.TimeSlot = timeSlot
+		newLesson.Index = timeSlot
 		newLesson.Regularity = lessonRegularity
 		newLesson.Day = dayNum
 
@@ -80,15 +80,15 @@ func parseDaySchedule(schedule []string) []lesson {
 		}
 
 		var additionalLesson lesson = matchToLesson(match2)
-		additionalLesson.TimeSlot = timeSlot
+		additionalLesson.Index = timeSlot
 		additionalLesson.Regularity = lessonRegularity
 		additionalLesson.Day = dayNum
 
 		if additionalLesson.Title == "" {
 			additionalLesson.Title = newLesson.Title
 		}
-		if additionalLesson.LessonType == "" {
-			additionalLesson.LessonType = newLesson.LessonType
+		if additionalLesson.Type == "" {
+			additionalLesson.Type = newLesson.Type
 		}
 
 		lessons = append(lessons, additionalLesson)
@@ -101,7 +101,7 @@ func matchToLesson(match *regexp2.Match) lesson {
 	var newLesson lesson
 
 	newLesson.Title = match.GroupByName("title").String()
-	newLesson.LessonType = match.GroupByName("type").String()
+	newLesson.Type = match.GroupByName("type").String()
 	newLesson.Group = match.GroupByName("group").String()
 	newLesson.Building = match.GroupByName("building").String()
 	newLesson.Room = match.GroupByName("room").String()
