@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,57 +28,31 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		var output string
+		coursesCount := len(getCourses())
 
-		var group = "ИУК4-61Б"
-		var schedule = getSchedule(3, group)
+		output := ""
 
-		for _, daySchedule := range schedule {
+		for course := 0; course < coursesCount; course++ {
+			groups := Values(getGroups(course))
 
-			var lessons = parseDaySchedule(daySchedule, group)
+			for _, group := range groups {
+				schedule := getSchedule(course, group)
 
-			a, _ := json.MarshalIndent(lessons, "", "	")
+				// optional
+				// time.Sleep(100 * time.Millisecond)
 
-			output += string(a[:]) + "\n"
+				for _, daySchedule := range schedule {
+					lessons := parseDaySchedule(daySchedule, group)
+
+					stringRepresentation, _ := json.MarshalIndent(lessons, "", " ")
+
+					output += string(stringRepresentation[:]) + "\n"
+				}
+			}
 		}
 
 		return c.SendString(output)
 	})
 
 	log.Fatal(app.Listen(":3000"))
-}
-
-func getSchedule(year int, group string) map[string][]string {
-
-	agent := fiber.AcquireAgent()
-	agent.Request().Header.SetMethod("GET")
-	agent.Request().SetRequestURI(apiPath +
-		"getschedule/" +
-		fmt.Sprint(year-1) + "/" +
-		group + "/" +
-		"")
-
-	var err = agent.Parse()
-
-	if err != nil {
-		panic("[REQUEST ERROR] " + err.Error())
-	}
-
-	var statusCode, body, errs = agent.Bytes()
-
-	if len(errs) > 0 {
-		panic("[REQUEST ERROR] (status code: " + fmt.Sprint(statusCode) + ")")
-	}
-
-	var result map[string][]string
-	err = json.Unmarshal(body, &result)
-
-	if err != nil {
-		println(err.Error())
-		panic("[REQUEST ERROR] response unmarshaling error")
-	}
-
-	fiber.ReleaseAgent(agent)
-
-	return result
 }
