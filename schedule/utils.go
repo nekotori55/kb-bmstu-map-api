@@ -20,3 +20,11 @@ func stringStartsWithAnyOf(of []string, str string) (success bool, of_index int)
 	}
 	return false, -1
 }
+
+func Values[M ~map[K]V, K comparable, V any](m M) []V {
+	r := make([]V, 0, len(m))
+	for _, v := range m {
+		r = append(r, v)
+	}
+	return r
+}
