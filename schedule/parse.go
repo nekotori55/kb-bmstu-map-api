@@ -17,7 +17,7 @@ var scheduleParseExp = regexp2.MustCompile(``+
 	`(?P<notes>[а-я. ]+)? ?`,
 	regexp2.RE2)
 
-func parseDaySchedule(schedule []string) []lesson {
+func parseDaySchedule(schedule []string, group string) []lesson {
 	var lessonRegularityTokens = []string{"Ч", "З", "П"}
 
 	var lessons []lesson
@@ -67,6 +67,7 @@ func parseDaySchedule(schedule []string) []lesson {
 		newLesson.Index = timeSlot
 		newLesson.Regularity = lessonRegularity
 		newLesson.Day = dayNum
+		newLesson.Group = group
 
 		lessons = append(lessons, newLesson)
 
@@ -83,6 +84,7 @@ func parseDaySchedule(schedule []string) []lesson {
 		additionalLesson.Index = timeSlot
 		additionalLesson.Regularity = lessonRegularity
 		additionalLesson.Day = dayNum
+		additionalLesson.Group = group
 
 		if additionalLesson.Title == "" {
 			additionalLesson.Title = newLesson.Title

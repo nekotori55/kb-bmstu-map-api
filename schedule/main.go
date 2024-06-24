@@ -31,9 +31,12 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		var output string
 
-		var schedule = getSchedule(3, "ИУК4-61Б")
+		var group = "ИУК4-61Б"
+		var schedule = getSchedule(3, group)
+
 		for _, daySchedule := range schedule {
-			var lessons = parseDaySchedule(daySchedule)
+
+			var lessons = parseDaySchedule(daySchedule, group)
 
 			a, _ := json.MarshalIndent(lessons, "", "	")
 
