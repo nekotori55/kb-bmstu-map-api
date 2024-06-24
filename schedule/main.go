@@ -73,5 +73,7 @@ func getSchedule(year int, group string) map[string][]string {
 		panic("[REQUEST ERROR] response unmarshaling error")
 	}
 
+	fiber.ReleaseAgent(agent)
+
 	return result
 }
