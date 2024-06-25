@@ -102,9 +102,18 @@ func parseDaySchedule(schedule []string, group string) []lesson {
 func matchToLesson(match *regexp2.Match) lesson {
 	var newLesson lesson
 
+	subgroupString := match.GroupByName("group").String()
+
+	success, index := stringStartsWithAnyOf(romanNumbers, subgroupString)
+
+	if !success {
+		newLesson.Subgroup = 0
+	} else {
+		newLesson.Subgroup = index + 1
+	}
+
 	newLesson.Title = match.GroupByName("title").String()
 	newLesson.Type = match.GroupByName("type").String()
-	newLesson.Group = match.GroupByName("group").String()
 	newLesson.Building = match.GroupByName("building").String()
 	newLesson.Room = match.GroupByName("room").String()
 	newLesson.Professors = match.GroupByName("professors").String()
