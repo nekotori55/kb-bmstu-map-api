@@ -11,18 +11,18 @@ import (
 )
 
 type lesson struct {
-	Title      string `json:"title"`
-	Type       string `json:"type"`
-	Group      string `json:"group"`
-	Subgroup   int    `json:"subgroup"`
-	Building   string `json:"building"`
-	Room       string `json:"room"`
-	Professors string `json:"professors"`
-	Notes      string `json:"notes"`
+	Title      string `json:"title" db:"title"`
+	Type       string `json:"type" db:"type"`
+	Group      string `json:"group" db:"group"`
+	Subgroup   int    `json:"subgroup" db:"subgroup"`
+	Building   string `json:"building" db:"building"`
+	Room       string `json:"room" db:"room"`
+	Professors string `json:"professors" db:"professors"`
+	Notes      string `json:"notes" db:"notes"`
 
-	Day        int `json:"day"`
-	Regularity int `json:"regularity"`
-	Index      int `json:"index"`
+	Day        int `json:"day" db:"day"`
+	Regularity int `json:"regularity" db:"regularity"`
+	Index      int `json:"index" db:"index"`
 }
 
 var apiPath = "https://schedule.iuk4.ru/api/"
