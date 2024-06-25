@@ -17,14 +17,14 @@ INSERT INTO time_slots("index", startTime, endTime) VALUES (7, '19:35', '21:10')
 CREATE TABLE schedule
 (
     id SERIAL PRIMARY KEY,
-    title CHARACTER(100),
-    "group" CHARACTER(10),
+    title VARCHAR(100),
+    "group" VARCHAR(10),
     subgroup INTEGER CHECK (subgroup BETWEEN 0 AND 4),
-    building CHARACTER(20),
-    "type" CHARACTER(5),
-    room CHARACTER(20),
-    professors CHARACTER(100),
-    notes CHARACTER(100),
+    building VARCHAR(20),
+    "type" VARCHAR(5),
+    room VARCHAR(20),
+    professors VARCHAR(100),
+    notes VARCHAR(100),
     regularity INTEGER CHECK (regularity BETWEEN 1 AND 3),
     "day" INTEGER CHECK ("day" BETWEEN 1 AND 6),
 
