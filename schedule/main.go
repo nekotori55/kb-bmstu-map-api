@@ -1,10 +1,13 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v5"
 )
 
 type lesson struct {
@@ -24,13 +27,26 @@ type lesson struct {
 
 var apiPath = "https://schedule.iuk4.ru/api/"
 
+var db *pgx.Conn
+
 func main() {
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	var err error
+	db, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer db.Close(context.Background())
+
+	app.Get("/schedule/update/", func(c *fiber.Ctx) error {
 		coursesCount := len(getCourses())
 
 		output := ""
+
+		var batch pgx.Batch
 
 		for course := 0; course < coursesCount; course++ {
 			groups := Values(getGroups(course))
@@ -42,13 +58,46 @@ func main() {
 				// time.Sleep(100 * time.Millisecond)
 
 				for _, daySchedule := range schedule {
-					lessons := parseDaySchedule(daySchedule, group)
+					var lessons = parseDaySchedule(daySchedule, group)
 
-					stringRepresentation, _ := json.MarshalIndent(lessons, "", " ")
+					if lessons == nil {
+						continue
+					}
 
-					output += string(stringRepresentation[:]) + "\n"
+					for _, lesson := range lessons {
+
+						batch.QueuedQueries = append(batch.QueuedQueries, &pgx.QueuedQuery{
+							SQL: `INSERT INTO schedule(` +
+								`title, "group",` +
+								`subgroup, building, ` +
+								`"type", room, ` +
+								`professors, notes, ` +
+								`regularity, "day", ` +
+								`"index"` +
+								`) VALUES (` +
+								`$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11` +
+								`)`,
+							Arguments: []any{
+								lesson.Title, lesson.Group,
+								lesson.Subgroup, lesson.Building,
+								lesson.Type, lesson.Room,
+								lesson.Professors, lesson.Notes,
+								lesson.Regularity, lesson.Day,
+								lesson.Index,
+							},
+						})
+					}
 				}
 			}
+		}
+
+		db.Exec(context.Background(), "TRUNCATE TABLE schedule")
+
+		results := db.SendBatch(context.Background(), &batch)
+		err := results.Close()
+
+		if err != nil {
+			panic(err.Error())
 		}
 
 		return c.SendString(output)
