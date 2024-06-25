@@ -7,6 +7,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-kb_bmstu_map_api_db}
     volumes:
       - ./schedule:/go/src/app
     networks:
