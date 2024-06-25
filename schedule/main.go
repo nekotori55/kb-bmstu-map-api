@@ -11,6 +11,7 @@ import (
 )
 
 type lesson struct {
+	Id         int    `json:"id" db:"id"`
 	Title      string `json:"title" db:"title"`
 	Type       string `json:"type" db:"type"`
 	Group      string `json:"group" db:"group"`
@@ -23,6 +24,9 @@ type lesson struct {
 	Day        int `json:"day" db:"day"`
 	Regularity int `json:"regularity" db:"regularity"`
 	Index      int `json:"index" db:"index"`
+
+	StartTime string `json:"startTime" db:"startTime"`
+	EndTime   string `json:"endTime" db:"endTime"`
 }
 
 var apiPath = "https://schedule.iuk4.ru/api/"
@@ -107,8 +111,10 @@ func main() {
 		filters := c.Queries()
 
 		query := `SELECT ` +
-			`title, "group", subgroup, building, "type", room, professors, notes, regularity, "day", "index" ` +
-			`FROM schedule `
+			`id, title, "group", subgroup, building, "type", room, professors, notes, regularity, "day", ` +
+			`schedule."index" AS "index", startTime, endTime ` +
+			`FROM schedule ` +
+			`JOIN time_slots ON time_slots."index" = schedule."index" `
 
 		if len(filters) > 0 {
 			query += `WHERE `
@@ -167,11 +173,6 @@ func main() {
 		if err := rows.Err(); err != nil {
 			panic(err.Error())
 		}
-
-		// result, err := json.Marshal(lessons)
-		// if err != nil {
-		// 	panic(err.Error())
-		// }
 
 		return c.JSON(lessons)
 	})
