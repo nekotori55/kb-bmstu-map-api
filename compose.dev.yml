@@ -4,9 +4,13 @@ services:
     build:
       context: schedule
       target: dev
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
       - ./schedule:/go/src/app
-
+    networks:
+      - postgres
     ports:
       - 3000:3000
 
