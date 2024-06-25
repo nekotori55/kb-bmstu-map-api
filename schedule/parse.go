@@ -5,16 +5,16 @@ import (
 )
 
 var scheduleParseExp = regexp2.MustCompile(``+
-	`(?P<title>[А-Яа-я \/.,-]+?)? ?`+
+	`(?P<title>[А-Яа-яёЁ \/.,-]+?)? ?`+
 	`(?P<type>упр.|лекц.|лаб.|к.р.|к.пр.)? ?`+
 	`(?P<group>I|II|III|IV|IIII)? ?`+
 	`(?P<location>`+
-	/**/ `(?P<building>\d)[-_](?P<room>\d{3}[а-я]?(?:[\/\d]{2})?)`+
+	/**/ `(?P<building>\d)[-_](?P<room>\d{3}[а-яё]?(?:[\/\d]{2})?)`+
 	/**/ `|к\.(?P<building>\d)`+
 	/**/ `|(?P<building>УАК\d)-(?P<room>\d.\d{2})`+
 	/**/ `|(?P<building>НПП "Тайфун"|ООО РИТЦ|ОКБ "МЭЛ")) ?`+
-	`(?P<professors>(?:(?:[А-Я][а-я]+)+(?:, [А-Я][а-я]+)*))? ?`+
-	`(?P<notes>[а-я. ]+)? ?`,
+	`(?P<professors>(?:(?:[А-ЯЁ][а-яё]+)+(?:, [А-ЯЁ][а-яё]+)*))? ?`+
+	`(?P<notes>[а-яё. ]+)? ?`,
 	regexp2.RE2)
 
 func parseDaySchedule(schedule []string, group string) []lesson {
