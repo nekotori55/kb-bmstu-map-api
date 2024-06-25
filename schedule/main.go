@@ -103,5 +103,78 @@ func main() {
 		return c.SendString(output)
 	})
 
+	app.Get("/schedule/get", func(c *fiber.Ctx) error {
+		filters := c.Queries()
+
+		query := `SELECT ` +
+			`title, "group", subgroup, building, "type", room, professors, notes, regularity, "day", "index" ` +
+			`FROM schedule `
+
+		if len(filters) > 0 {
+			query += `WHERE `
+		}
+
+		filtersAdded := 0
+
+		val, ok := filters["building"]
+		if ok {
+			query += `building = '` + val + `' `
+			filtersAdded++
+		}
+
+		val, ok = filters["room"]
+		if ok {
+			if filtersAdded != 0 {
+				query += `AND `
+			}
+			query += `room = '` + val + `' `
+			filtersAdded++
+		}
+
+		val, ok = filters["day"]
+		if ok {
+			if filtersAdded != 0 {
+				query += `AND `
+			}
+			query += `"day" = ` + val + ` `
+			filtersAdded++
+		}
+
+		val, ok = filters["regularity"]
+		if ok {
+
+			if val != "3" {
+				if filtersAdded != 0 {
+					query += `AND `
+				}
+				query += `regularity = ` + val + ` `
+				filtersAdded++
+			}
+		}
+
+		query += `;`
+
+		rows, err := db.Query(context.Background(), query)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		lessons, err := pgx.CollectRows(rows, pgx.RowToStructByName[lesson])
+		if err != nil {
+			panic(err.Error())
+		}
+		if err := rows.Err(); err != nil {
+			panic(err.Error())
+		}
+
+		// result, err := json.Marshal(lessons)
+		// if err != nil {
+		// 	panic(err.Error())
+		// }
+
+		return c.JSON(lessons)
+	})
+
 	log.Fatal(app.Listen(":3000"))
 }
