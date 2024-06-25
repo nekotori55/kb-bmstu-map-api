@@ -1,8 +1,8 @@
 CREATE TABLE time_slots
 (
     "index" INTEGER PRIMARY KEY,
-    startTime TIME,
-    endTime TIME
+    startTime CHARACTER(5),
+    endTime CHARACTER(5)
 );
 
 INSERT INTO time_slots("index", startTime, endTime) VALUES (1, '08:30', '10:05');
