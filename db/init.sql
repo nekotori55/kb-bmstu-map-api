@@ -1,5 +1,3 @@
-CREATE DATABASE kb_bmstu_map_api;
-
 CREATE TABLE time_slots
 (
     "index" INTEGER PRIMARY KEY,
@@ -20,10 +18,10 @@ CREATE TABLE schedule
 (
     id SERIAL PRIMARY KEY,
     title CHARACTER(100),
-    "group" CHARACTER(10)
-    subgroup INTEGER CHECK (subgroup BETWEEN 1 AND 4),
+    "group" CHARACTER(10),
+    subgroup INTEGER CHECK (subgroup BETWEEN 0 AND 4),
     building CHARACTER(20),
-    "type" CHARACTER(5)
+    "type" CHARACTER(5),
     room CHARACTER(20),
     professors CHARACTER(100),
     notes CHARACTER(100),
@@ -31,4 +29,4 @@ CREATE TABLE schedule
     "day" INTEGER CHECK ("day" BETWEEN 1 AND 6),
 
     "index" INTEGER REFERENCES time_slots("index")
-)
+);
