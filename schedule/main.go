@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -35,6 +36,7 @@ var db *pgx.Conn
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New())
 
 	var err error
 	db, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
