@@ -155,7 +155,7 @@ func main() {
 				if filtersAdded != 0 {
 					query += `AND `
 				}
-				query += `regularity = ` + val + ` `
+				query += `(regularity = ` + val + ` ` + ` OR regularity = 3) `
 				filtersAdded++
 			}
 		}
