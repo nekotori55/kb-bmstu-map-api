@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v5"
@@ -38,13 +39,7 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 
-	var err error
-	db, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
+	initDB()
 	defer db.Close(context.Background())
 
 	app.Get("/schedule/update/", func(c *fiber.Ctx) error {
@@ -112,72 +107,70 @@ func main() {
 	app.Get("/schedule/get", func(c *fiber.Ctx) error {
 		filters := c.Queries()
 
-		query := `SELECT ` +
-			`id, title, "group", subgroup, building, "type", room, professors, notes, regularity, "day", ` +
-			`schedule."index" AS "index", startTime, endTime ` +
-			`FROM schedule ` +
-			`JOIN time_slots ON time_slots."index" = schedule."index" `
-
-		if len(filters) > 0 {
-			query += `WHERE `
-		}
-
-		filtersAdded := 0
-
-		val, ok := filters["building"]
-		if ok {
-			query += `building = '` + val + `' `
-			filtersAdded++
-		}
-
-		val, ok = filters["room"]
-		if ok {
-			if filtersAdded != 0 {
-				query += `AND `
-			}
-			query += `room = '` + val + `' `
-			filtersAdded++
-		}
-
-		val, ok = filters["day"]
-		if ok {
-			if filtersAdded != 0 {
-				query += `AND `
-			}
-			query += `"day" = ` + val + ` `
-			filtersAdded++
-		}
-
-		val, ok = filters["regularity"]
-		if ok {
-
-			if val != "3" {
-				if filtersAdded != 0 {
-					query += `AND `
-				}
-				query += `(regularity = ` + val + ` ` + ` OR regularity = 3) `
-				filtersAdded++
-			}
-		}
-
-		query += `;`
-
-		rows, err := db.Query(context.Background(), query)
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		lessons, err := pgx.CollectRows(rows, pgx.RowToStructByName[lesson])
-		if err != nil {
-			panic(err.Error())
-		}
-		if err := rows.Err(); err != nil {
-			panic(err.Error())
-		}
+		lessons := getLessons(filters)
 
 		return c.JSON(lessons)
 	})
 
 	log.Fatal(app.Listen(":3000"))
+}
+
+func getLessons(filters map[string]string) []lesson {
+	query, args := buildQuery(filters)
+
+	println(query)
+
+	rows, err := db.Query(context.Background(), query, args...)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	lessons, err := pgx.CollectRows(rows, pgx.RowToStructByName[lesson])
+	if err != nil {
+		panic(err.Error())
+	}
+	return lessons
+}
+
+func buildQuery(filters map[string]string) (string, []any) {
+	columns := []string{
+		"id", "title", `"group"`, "subgroup", "building",
+		`"type"`, "room", "professors", "notes",
+		"regularity", `"day"`, `schedule."index" as "index"`, "startTime", "endTime",
+	}
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	requestBuilder := psql.Select(columns...).From("schedule").Join("time_slots ON time_slots.index = schedule.index")
+
+	if val, ok := filters["building"]; ok {
+		requestBuilder = requestBuilder.Where("building = ?", val)
+	}
+
+	if val, ok := filters["room"]; ok {
+		requestBuilder = requestBuilder.Where("room = ?", val)
+	}
+
+	if val, ok := filters["day"]; ok {
+		requestBuilder = requestBuilder.Where(`"day" = ?`, val)
+	}
+
+	if val, ok := filters["regularity"]; ok {
+		requestBuilder = requestBuilder.Where("(regularity = ? OR regularity = 3)", val)
+	}
+
+	query, args, err := requestBuilder.ToSql()
+	if err != nil {
+		panic(err.Error())
+	}
+	return query, args
+}
+
+func initDB() {
+	var err error
+	db, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
 }
