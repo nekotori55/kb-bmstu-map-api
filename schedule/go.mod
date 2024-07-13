@@ -1,4 +1,4 @@
-module github.com/nekotori55/kb-bmstu-map-api
+module kb-bmstu-map-api/schedule
 
 go 1.22.4
 
