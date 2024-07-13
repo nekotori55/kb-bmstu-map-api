@@ -31,8 +31,6 @@ type lesson struct {
 	EndTime   string `json:"endTime" db:"endTime"`
 }
 
-var apiPath = "https://schedule.iuk4.ru/api/"
-
 var db *pgx.Conn
 
 func main() {
