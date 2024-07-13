@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+
 func getSchedule(course int, group string) map[string][]string {
 	statusCode, body := getJSONFromURI(apiPath + "/getschedule/" + fmt.Sprint(course) + "/" + group)
 
