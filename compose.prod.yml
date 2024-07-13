@@ -1,0 +1,7 @@
+services:
+  schedule:
+    build: 
+      context: schedule
+      target: prod
+    volumes:
+      - ./schedule:/go/src/app
