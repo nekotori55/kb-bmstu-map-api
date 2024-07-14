@@ -40,12 +40,12 @@ func main() {
 	initDB()
 	defer db.Close(context.Background())
 
-	app.Get("/schedule/update/", func(c *fiber.Ctx) error {
+	app.Get("/update", func(c *fiber.Ctx) error {
 		output := updateSchedule()
 		return c.SendString(output)
-	}) 
+	})
 
-	app.Get("/schedule/get", func(c *fiber.Ctx) error {
+	app.Get("/get", func(c *fiber.Ctx) error {
 		filters := c.Queries()
 		lessons := getLessons(filters)
 		return c.JSON(lessons)
