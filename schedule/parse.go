@@ -23,7 +23,7 @@ func parseDaySchedule(schedule []string, group string) []lesson {
 	var lessons []lesson
 
 	var dayNum int
-	if success, entryIndex := stringStartsWithAnyOf(weekdays, schedule[0]); success {
+	if success, entryIndex := StringStartsWithAnyOf(weekdays, schedule[0]); success {
 		dayNum = entryIndex + 1
 	}
 
@@ -33,13 +33,13 @@ func parseDaySchedule(schedule []string, group string) []lesson {
 	var lessonRegularity int
 	for _, entry := range schedule {
 		// string is a classNum
-		if success, entryIndex := stringStartsWithAnyOf(romanNumbers, entry); success {
+		if success, entryIndex := StringStartsWithAnyOf(romanNumbers, entry); success {
 			timeSlot = entryIndex + 1
 			continue
 		}
 
-		if slen(entry) == 1 {
-			success, entryIndex := stringStartsWithAnyOf(lessonRegularityTokens, entry)
+		if Slen(entry) == 1 {
+			success, entryIndex := StringStartsWithAnyOf(lessonRegularityTokens, entry)
 			if !success {
 				panic("[PARSING ERROR] Wrong regularity token")
 			}
@@ -56,9 +56,7 @@ func parseDaySchedule(schedule []string, group string) []lesson {
 		var err error
 
 		match, err = scheduleParseExp.FindStringMatch(entry)
-		if err != nil {
-			panic(err.Error())
-		}
+		Check(err)
 		if match == nil {
 			panic("[PARSING ERROR] Bad schedule entry" + entry)
 		}
@@ -73,9 +71,7 @@ func parseDaySchedule(schedule []string, group string) []lesson {
 
 		// If the lesson string has a second part
 		match2, err = scheduleParseExp.FindNextMatch(match)
-		if err != nil {
-			panic(err.Error())
-		}
+		Check(err)
 		if match2 == nil {
 			continue
 		}
@@ -104,7 +100,7 @@ func matchToLesson(match *regexp2.Match) lesson {
 
 	subgroupString := match.GroupByName("group").String()
 
-	success, index := stringStartsWithAnyOf(romanNumbers, subgroupString)
+	success, index := StringStartsWithAnyOf(romanNumbers, subgroupString)
 
 	if !success {
 		newLesson.Subgroup = 0

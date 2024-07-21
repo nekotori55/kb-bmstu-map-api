@@ -92,9 +92,7 @@ func updateSchedule() string {
 	results := db.SendBatch(context.Background(), &batch)
 	err := results.Close()
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 	return output
 }
 
@@ -104,14 +102,10 @@ func getLessons(filters map[string]string) []lesson {
 	println(query)
 
 	rows, err := db.Query(context.Background(), query, args...)
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 
 	lessons, err := pgx.CollectRows(rows, pgx.RowToStructByName[lesson])
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 	return lessons
 }
 
@@ -142,9 +136,7 @@ func buildQuery(filters map[string]string) (string, []any) {
 	}
 
 	query, args, err := requestBuilder.ToSql()
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 	return query, args
 }
 

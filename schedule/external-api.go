@@ -20,9 +20,7 @@ func getSchedule(course int, group string) map[string][]string {
 
 	err := json.Unmarshal(body, &schedule)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 
 	return schedule
 }
@@ -32,15 +30,13 @@ func getJSONFromURI(url string) (int, []byte) {
 
 	err := agent.Parse()
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 
 	statusCode, body, errs := agent.Bytes()
 	fiber.ReleaseAgent(agent)
 
 	if len(errs) > 0 {
-		panic(errs[0].Error())
+		Check(errs[0])
 	}
 
 	return statusCode, body
@@ -56,9 +52,7 @@ func getCourses() map[int]string {
 
 	err := json.Unmarshal(body, &courses)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 
 	return courses
 }
@@ -74,9 +68,7 @@ func getGroups(course int) map[string]string {
 
 	err := json.Unmarshal(body, &groups)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Check(err)
 
 	return groups
 }
