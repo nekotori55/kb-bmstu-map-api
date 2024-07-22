@@ -1,6 +1,9 @@
 package main
 
 import (
+	"errors"
+	. "kb-bmstu-map-api/schedule/utils"
+
 	"github.com/dlclark/regexp2"
 )
 
@@ -17,103 +20,125 @@ var scheduleParseExp = regexp2.MustCompile(``+
 	`(?P<notes>[а-яё. ]+)? ?`,
 	regexp2.RE2)
 
-func parseDaySchedule(schedule []string, group string) []lesson {
-	var lessonRegularityTokens = []string{"Ч", "З", "П"}
+var lessonRegularityTokens = []string{"Ч", "З", "П"}
 
+func parseDaySchedule(schedule []string) []lesson {
 	var lessons []lesson
 
-	var dayNum int
-	if success, entryIndex := StringStartsWithAnyOf(weekdays, schedule[0]); success {
-		dayNum = entryIndex + 1
-	}
+	day := schedule[0]
+	schedule = schedule[1:] // removing weekday
 
-	schedule = schedule[1:] // removing weekday string
+	dayNum, err := parseDay(day)
+	Must(err)
 
-	var timeSlot int
+	// BIT FLAGS						 \n
+	// 'Ч'(числитель) => 1 = 01 		 \n
+	// 'З'(знаменатель) => 2 = 10		 \n
+	// 'П'(постоянное) => 3 = 11
 	var lessonRegularity int
+	var timeSlot int
 	for _, entry := range schedule {
-		// string is a classNum
-		if success, entryIndex := StringStartsWithAnyOf(romanNumbers, entry); success {
-			timeSlot = entryIndex + 1
+		if timeSlotIndex, err := parseTimeSlot(entry); err == nil {
+			timeSlot = timeSlotIndex
 			continue
 		}
 
-		if Slen(entry) == 1 {
-			success, entryIndex := StringStartsWithAnyOf(lessonRegularityTokens, entry)
-			if !success {
-				panic("[PARSING ERROR] Wrong regularity token")
+		if StringLen(entry) == 1 {
+			if lessonRegularity, err = parseRegularity(entry); err == nil {
+				continue
 			}
-
-			// BIT FLAGS
-			// 'Ч'(числитель) => 1 = 01
-			// 'З'(знаменатель) => 2 = 10
-			// 'П'(постоянное) => 3 = 11
-			lessonRegularity = entryIndex + 1
-			continue
 		}
 
 		var match, match2 *regexp2.Match
 		var err error
 
 		match, err = scheduleParseExp.FindStringMatch(entry)
-		Check(err)
+		Must(err)
 		if match == nil {
 			panic("[PARSING ERROR] Bad schedule entry" + entry)
 		}
 
 		var newLesson lesson = matchToLesson(match)
 		newLesson.Index = timeSlot
+		if timeSlot == 0 {
+			print(entry)
+		}
 		newLesson.Regularity = lessonRegularity
 		newLesson.Day = dayNum
-		newLesson.Group = group
-
-		lessons = append(lessons, newLesson)
 
 		// If the lesson string has a second part
 		match2, err = scheduleParseExp.FindNextMatch(match)
-		Check(err)
+		Must(err)
 		if match2 == nil {
 			continue
 		}
 
-		var additionalLesson lesson = matchToLesson(match2)
-		additionalLesson.Index = timeSlot
-		additionalLesson.Regularity = lessonRegularity
-		additionalLesson.Day = dayNum
-		additionalLesson.Group = group
-
-		if additionalLesson.Title == "" {
-			additionalLesson.Title = newLesson.Title
+		var adjacentLesson lesson = matchToLesson(match2)
+		if adjacentLesson.Title == "" {
+			adjacentLesson.Title = newLesson.Title
 		}
-		if additionalLesson.Type == "" {
-			additionalLesson.Type = newLesson.Type
+		if adjacentLesson.Type == "" {
+			adjacentLesson.Type = newLesson.Type
 		}
+		adjacentLesson.Index = timeSlot
+		adjacentLesson.Regularity = lessonRegularity
+		adjacentLesson.Day = dayNum
 
-		lessons = append(lessons, additionalLesson)
+		lessons = append(lessons, newLesson)
+		lessons = append(lessons, adjacentLesson)
 	}
 
 	return lessons
 }
 
+func parseDay(entry string) (dayNum int, err error) {
+	if tokenIndex := StringStartsWithToken(Weekdays, entry); tokenIndex != -1 {
+		dayNum = tokenIndex + 1
+	} else {
+		err = errors.New("[PARSING ERROR] Wrong day token: " + entry)
+	}
+	return
+}
+
+func parseRegularity(entry string) (regularity int, err error) {
+	if tokenIndex := StringStartsWithToken(lessonRegularityTokens, entry); tokenIndex != -1 {
+		regularity = tokenIndex + 1
+	} else {
+		err = errors.New("[PARSING ERROR] Wrong regularity token: " + entry)
+	}
+	return
+}
+
+func parseTimeSlot(entry string) (timeSlot int, err error) {
+	if tokenIndex := StringStartsWithToken(RomanNumbers, entry); tokenIndex != -1 {
+		timeSlot = tokenIndex + 1
+	} else {
+		err = errors.New("[PARSING ERROR] Wrong timeSlot token: " + entry)
+	}
+	return
+}
+
+func parseSubgroup(entry string) (subgroup int) {
+	if tokenIndex := StringStartsWithToken(RomanNumbers, entry); tokenIndex != -1 {
+		subgroup = tokenIndex + 1
+	} else {
+		subgroup = 0
+	}
+	return
+}
+
 func matchToLesson(match *regexp2.Match) lesson {
-	var newLesson lesson
+	var lesson lesson
 
 	subgroupString := match.GroupByName("group").String()
+	lesson.Subgroup = parseSubgroup(subgroupString)
 
-	success, index := StringStartsWithAnyOf(romanNumbers, subgroupString)
+	lesson.Title = match.GroupByName("title").String()
+	lesson.Type = match.GroupByName("type").String()
+	lesson.Building = match.GroupByName("building").String()
+	lesson.Room = match.GroupByName("room").String()
+	lesson.Professors = match.GroupByName("professors").String()
+	lesson.Notes = match.GroupByName("notes").String()
 
-	if !success {
-		newLesson.Subgroup = 0
-	} else {
-		newLesson.Subgroup = index + 1
-	}
-
-	newLesson.Title = match.GroupByName("title").String()
-	newLesson.Type = match.GroupByName("type").String()
-	newLesson.Building = match.GroupByName("building").String()
-	newLesson.Room = match.GroupByName("room").String()
-	newLesson.Professors = match.GroupByName("professors").String()
-	newLesson.Notes = match.GroupByName("notes").String()
-
-	return newLesson
+	return lesson
 }
