@@ -1,16 +1,18 @@
-package main
+package external_api
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+
+	. "kb-bmstu-map-api/schedule/utils"
 )
 
 var apiPath = "https://schedule.iuk4.ru/api/"
 
-func getSchedule(course int, group string) map[string][]string {
-	statusCode, body := getJSONFromURI(apiPath + "/getschedule/" + fmt.Sprint(course) + "/" + group)
+func GetSchedule(course int, group string) map[string][]string {
+	statusCode, body := GetJSONFromURI(apiPath + "/getschedule/" + fmt.Sprint(course) + "/" + group)
 
 	if statusCode != 200 {
 		panic("func getSchedule(): status code -  " + fmt.Sprint(statusCode))
@@ -20,34 +22,30 @@ func getSchedule(course int, group string) map[string][]string {
 
 	err := json.Unmarshal(body, &schedule)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Must(err)
 
 	return schedule
 }
 
-func getJSONFromURI(url string) (int, []byte) {
+func GetJSONFromURI(url string) (int, []byte) {
 	agent := fiber.Get(url)
 
 	err := agent.Parse()
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Must(err)
 
 	statusCode, body, errs := agent.Bytes()
 	fiber.ReleaseAgent(agent)
 
 	if len(errs) > 0 {
-		panic(errs[0].Error())
+		Must(errs[0])
 	}
 
 	return statusCode, body
 }
 
-func getCourses() map[int]string {
-	statusCode, body := getJSONFromURI(apiPath + "/getcourses")
+func GetCourses() map[int]string {
+	statusCode, body := GetJSONFromURI(apiPath + "/getcourses")
 	if statusCode != 200 {
 		panic("func getCourses(): status code -  " + fmt.Sprint(statusCode))
 	}
@@ -56,15 +54,13 @@ func getCourses() map[int]string {
 
 	err := json.Unmarshal(body, &courses)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Must(err)
 
 	return courses
 }
 
-func getGroups(course int) map[string]string {
-	statusCode, body := getJSONFromURI(apiPath + "/getgroups/" + fmt.Sprint(course))
+func GetGroups(course int) map[string]string {
+	statusCode, body := GetJSONFromURI(apiPath + "/getgroups/" + fmt.Sprint(course))
 
 	if statusCode != 200 {
 		panic("func getGroups(): status code -  " + fmt.Sprint(statusCode))
@@ -74,9 +70,7 @@ func getGroups(course int) map[string]string {
 
 	err := json.Unmarshal(body, &groups)
 
-	if err != nil {
-		panic(err.Error())
-	}
+	Must(err)
 
 	return groups
 }

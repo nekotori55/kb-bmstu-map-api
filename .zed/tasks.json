@@ -1,0 +1,12 @@
+[
+  {
+    "label": "compose up [dev]",
+    "command": "docker compose -f compose.core.yml -f compose.dev.yml up",
+    "use_new_terminal": true
+  },
+  {
+    "label": "compose up [prod]",
+    "command": "docker compose -f compose.core.yml -f compose.prod.yml up",
+    "use_new_terminal": true
+  }
+]
