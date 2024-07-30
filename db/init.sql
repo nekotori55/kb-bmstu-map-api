@@ -14,7 +14,7 @@ INSERT INTO time_slots("index", startTime, endTime) VALUES (6, '17:50', '19:25')
 INSERT INTO time_slots("index", startTime, endTime) VALUES (7, '19:35', '21:10');
 
 
-CREATE TABLE schedule
+CREATE TABLE classes
 (
     id SERIAL PRIMARY KEY,
     title VARCHAR(100),
