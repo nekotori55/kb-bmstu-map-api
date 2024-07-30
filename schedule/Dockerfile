@@ -3,8 +3,8 @@ FROM golang:alpine AS builder
 
 WORKDIR /go/src/app
 COPY . .
-RUN go get -d -v ./...
-RUN go build -o /go/bin/app -v ./...
+RUN go get -d ./api/
+RUN go build -o /go/bin/app ./api/app.go
 
 ######################################################
 # PROD BUILD
@@ -24,4 +24,4 @@ RUN mkdir "/go/build"
 COPY . .
 RUN go get github.com/githubnemo/CompileDaemon
 RUN go install github.com/githubnemo/CompileDaemon
-ENTRYPOINT CompileDaemon -build="go build -o /go/build/app" -command="/go/build/app"
+ENTRYPOINT CompileDaemon -build="go build -o /go/build/app -v ./api/" -command="/go/build/app"

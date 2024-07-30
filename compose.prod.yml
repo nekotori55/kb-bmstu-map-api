@@ -1,6 +1,6 @@
 services:
   schedule:
-    build: 
+    build:
       context: schedule
       target: prod
     volumes:
