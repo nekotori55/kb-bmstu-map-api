@@ -23,10 +23,6 @@ func main() {
 		sourceRepository,
 	)
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello fiber versioning boilerplate")
-	})
-
 	// API Group Versions
 	v1 := app.Group("/v1")
 	routes_v1.ScheduleRouter(v1, scheduleUsecaseV1)
