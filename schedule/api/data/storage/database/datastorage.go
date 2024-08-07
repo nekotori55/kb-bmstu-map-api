@@ -26,6 +26,7 @@ func (s *databaseStorageRepositoryForV1) SetClasses(classes []v1.Class) error {
 }
 
 func (s *databaseStorageRepositoryForV1) GetClassesFiltered(filters map[string]string) (c []v1.Class, err error) {
+	c = []v1.Class{}
 	query, args := buildSearchQuery(filters)
 
 	rows, err := db.Query(context.Background(), query, args...)
