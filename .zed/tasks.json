@@ -1,13 +1,5 @@
 [
   {
-    "label": "compose build [dev]",
-    "command": "docker-compose -f compose.core.yml -f compose.dev.yml build"
-  },
-  {
-    "label": "compose build [prod]",
-    "command": "docker-compose -f compose.core.yml -f compose.prod.yml build"
-  },
-  {
     "label": "compose up [dev]",
     "command": "docker compose -f compose.core.yml -f compose.dev.yml up",
     "use_new_terminal": true
@@ -18,15 +10,7 @@
     "use_new_terminal": true
   },
   {
-    "label": "compose down [dev]",
-    "command": "docker compose -f compose.core.yml -f compose.dev.yml down"
-  },
-  {
-    "label": "compose down [prod]",
-    "command": "docker compose -f compose.core.yml -f compose.prod.yml down"
-  },
-  {
-    "label": "Remove hanging docker containers",
-    "command": "docker-compose -f compose.core.yml -f compose.prod.yml rm -v"
+    "label": "(re)generate docs",
+    "command": "$ZED_WORKTREE_ROOT/generate-docs.sh"
   }
 ]
