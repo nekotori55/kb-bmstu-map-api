@@ -1,0 +1,137 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API для получения расписания КФ МГТУ им. Баумана по фильтрам",
+        "title": "kb-bmstu-map API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/v1/",
+    "paths": {
+        "/get": {
+            "get": {
+                "description": "Получить отфильтрованный массив JSON объектов описывающих пары",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получить расписание",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "\"УАК2\"",
+                        "description": "Идентификатор строения (УАК? / ? / Организация)",
+                        "name": "building",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"2.15\"",
+                        "description": "Идентификатор кабинета (?.?? / ??? в зависимости от здания)",
+                        "name": "room",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"1\"",
+                        "description": "Номер дня недели (1 - понедельник, 2 - вторник, ...)",
+                        "name": "day",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 2,
+                        "description": "Регулярность пар (1 - числитель, 2 - знаменатель, 3 - числитель и знаменатель)",
+                        "name": "regularity",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Class"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/update": {
+            "post": {
+                "description": "Отправить команду для обновления базы данных расписания с внешнего API",
+                "summary": "Обновить расписание (с внешнего API)",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entities.Class": {
+            "type": "object",
+            "properties": {
+                "building": {
+                    "type": "string",
+                    "example": "7"
+                },
+                "day": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "endTime": {
+                    "type": "string",
+                    "example": "15:50"
+                },
+                "group": {
+                    "type": "string",
+                    "example": "ИУК7-21М"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 208
+                },
+                "index": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "notes": {
+                    "type": "string",
+                    "example": "по расп.каф."
+                },
+                "professors": {
+                    "type": "string",
+                    "example": "Морозенко"
+                },
+                "regularity": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "room": {
+                    "type": "string",
+                    "example": "302"
+                },
+                "startTime": {
+                    "type": "string",
+                    "example": "14:15"
+                },
+                "subgroup": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Моделир. процессов в техносфере"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "упр."
+                }
+            }
+        }
+    }
+}
