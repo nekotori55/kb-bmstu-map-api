@@ -12,9 +12,10 @@ var scheduleParseExp = regexp2.MustCompile(``+
 	`(?P<subgroup>I|II|III|IV|IIII)? ?`+
 	`(?P<location>`+
 	/**/ `(?P<building>\d)[-_](?P<room>\d{3}[а-яё]?(?:[\/\d]{2})?)`+
-	/**/ `|к\.(?P<building>\d)`+
-	/**/ `|(?P<building>УАК\d)-(?P<room>\d.\d{2})`+
-	/**/ `|(?P<building>НПП "Тайфун"|ООО РИТЦ|ОКБ "МЭЛ")) ?`+
+	/**/ `|(?P<building>к\.\d лаб.)`+
+	/**/ `|(?P<building>к\.\d)` +
+	/**/ `|(?P<building>УАК\d)(-|_)(?P<room>\d.\d{2})`+
+	/**/ `|(?P<building>НПП "Тайфун"|ООО РИТЦ|ОКБ "МЭЛ"|Спортзал|ПАО "КАДВИ")) ?`+
 	`(?P<professors>(?:(?:[А-ЯЁ][а-яё]+)+(?:, [А-ЯЁ][а-яё]+)*))? ?`+
 	`(?P<notes>[а-яё. ]+)? ?`,
 	regexp2.RE2)
